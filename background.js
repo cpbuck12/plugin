@@ -52,6 +52,11 @@ function iDeskable(tabExtra)
   return false;
 }
 
+function getIcon(tabExtra)
+{
+  
+}
+
 var icons = {};
 var popups = [];
 var areas = [];
@@ -202,7 +207,6 @@ function TabExtra(tab)
   this.urlInfo = parseUrl(tab.url);
 }
 
-
 function isTabiDesktop(tab)
 {
   var regexp = new RegExp("/"+getGuid()+"/");
@@ -211,7 +215,7 @@ function isTabiDesktop(tab)
 
 function iDesktopUrl()
 {
-  return "file://h:/plugin/idesktop.html?guid=" + getGuid() + "&eid=" + chrome.i18n.getMessage("@@extension_id");
+  return "file://z:/abc/idesktop.html?guid=" + getGuid() + "&eid=" + chrome.i18n.getMessage("@@extension_id");
 }
 
 var port;
@@ -225,11 +229,20 @@ function openiDesktop(options)
     url: iDesktopUrl()
   }, function (tabs)
   {
+    function handleIcon()
+    {
+      if("openicon" in options)
+      {
+        
+      }
+    }
     if(tabs.length == 0)
     {
       if(rows.length == 0)
         createNewiDesktop();
-      chrome.tabs.create({ url: iDesktopUrl() },function(tab){/*
+      chrome.tabs.create({ url: iDesktopUrl() },function(tab) {
+
+           /*
         port = chrome.tabs.connect(tab.id);
         port.onMessage(function(msg) {
           if(msg.message == "start")
@@ -241,43 +254,48 @@ function openiDesktop(options)
             onMoveOffDeck(msg.options);
           }
         });*/
+        handleIcon();
       });
     }
-    else chrome.tabs.move([tabs[0].id], // move the existing tab here
+    else
     {
-      windowId: chrome.wndows.WINDOW_ID_CURRENT,
-      index: 0
-    });
+      chrome.tabs.move([tabs[0].id], // move the existing tab here
+      {
+        windowId: chrome.wndows.WINDOW_ID_CURRENT,
+        index: 0
+      });
+      handleIcon();
+    }
   });
 }
 
-function onPageActionClicked(tab)
+function onPageActionClicked(tabExtra)
 {
-  if(isiDesked(tab))
-    openiDesktop({}); // open iDesktop with no action
+  if(isiDesked(tabExtra))
+    openiDesktop({ openicon : tabExtra }); // open iDesktop with no action
   else
-    openiDesktop({}); // open iDesktop with new Icon
+    openiDesktop({ newicon : tabExtra }); // open iDesktop with new Icon
 }
 
-function updatePageAction(tab)
+function updatePageAction(tabExtra)
 {
   if(tab.status == "loading")
-    chrome.pageAction.hide(tab.id);
+    chrome.pageAction.hide(tabExtra.id);
   else
   {
-    if(isTabiDesktop(tab)) chrome.pageAction.hide(tab.id);
+    if(isTabiDesktop(tabExtra)) chrome.pageAction.hide(tabExtra.id);
     else
     {
-      if(iDeskable(tab))
+      if(iDeskable(tabExtra))
       {
-        if(isiDesked(tab))
-          chrome.pageAction.setIcon({ tabId : tab.id, path: "icon.png" });
+        if(isiDesked(tabExtra))
+          chrome.pageAction.setIcon({ tabId : tabExtra.id, path: "sysicon/icon.png" });
         else
-          chrome.pageAction.setIcon({ tabId : tab.id, path: "iconred.png" });
-        chrome.pageAction.show(tab.id);
+          chrome.pageAction.setIcon({ tabId : tabExtra.id, path: "sysicon/iconred.png" });
+        chrome.pageAction.show(tabExtra.id);
       }
       else
-        chrome.pageAction.hide(tab.id);
+        chrome.pageAction.hide(tabExtra.id);
     }
   }
 }
@@ -305,6 +323,6 @@ chrome.tabs.query(
 
 chrome.extension.onConnect.addListener(function(port) {
   port.onMessage.addListener(function (msg){
-    alert(msg.message);
+    alert("from the port="+msg.message);
   });
 });

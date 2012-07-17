@@ -1,6 +1,7 @@
 $(document).ready(function() {
-	var incoming = $(".system .name").filter( $(this).text() == "page data").parent().children().filter( ".value" );
-	var outgoing = $(".system .name").filter( $(this).text() == "extension data").parent().children().filter( ".value" );
+	var eventName = "OnData";
+	var incoming = $(".system > .page_data");
+	var outgoing = $(".system > .extension_data");
 
 	incoming.each(function() {
 		$(this).change(function() {
@@ -9,4 +10,10 @@ $(document).ready(function() {
 	  });
 	});
 	outgoing.text('test message');
+	var event = document.createEvent("Event");
+	event.initEvent(eventName,true,true);
+	incoming[0].addEventListener(eventName,function() {
+		outgoing[0].dispatchEvent(event);
+		alert("changed, sucka!");
+	});
 });
