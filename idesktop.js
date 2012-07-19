@@ -5,37 +5,34 @@ var eventName = "OnData";
 
 function InitDOM()
 {
-var system_elements = document.getElementsByClassName("system");
 
-function getElementText(elem)
+function getElementText()
 {
-	if("textContent" in elem)
-		return elem.textContent;
-	else if("innertText" in elem)
-		return elem.innerText;
+	if("innerText" in this)
+		return this.innerText;
+	else if("textContent" in this)
+		return this.textContent;
 }
 
-function setElementText(elem,val)
+function setElementText(val)
 {
-	if("textContent" in elem)
-		elem.textContent = val;
-	else if("innertText" in elem)
-		elem.innerText = val;
+	if("innerText" in this)
+		this.innerText = val;
+	else if("textContent" in this)
+		this.textContent = val;
 }
 
-for(isys = 0;isys < system_elements.length;isys++)
+var children = document.getElementsByClassName("system")[0].children;
+var idx;
+for(idx = 0; idx < children.length;idx++)
 {
-  var system_element = system_elements[isys];
-  for(ichld = 0;ichld < system_element.childNodes.length;ichld++)
-  {
-    var child = system_element.childNodes[ichld];
-    if(!(getElementText in child))
-       child['getElementText'] = function() { return getElementText(child); }
-    if(!(setElementText in child))
-       child['setElementText'] = function(val) { setElementText(child,val); }
-    domShares[child.className] = child;
-  }
-}
+  var child = children[idx];
+  if(!("getElementText" in child))
+    child.getElementText = getElementText;
+  if(!("setElementText" in child))
+    child.setElementText = setElementText;
+  domShares[child.className] = child;
+};
 
 }// InitDOM
 
@@ -47,17 +44,18 @@ function InitEvents() {
   var extension_data = domShares["extension_data"];
   
   extensionPort.onMessage.addListener(function (msg) { // from background to page
-    page_data.setElementText(msg.message);
+    page_data.setElementText(msg);
     page_data.dispatchEvent(event);
   });
   extension_data.addEventListener(eventName,function() { // from page to background
-    alert(eventName+"333");
-    extensionPort.postMessage({ message : extension_data.getElementText() });
+    var val = extension_data.getElementText();
+    extensionPort.postMessage(val);
   });
+  /* removed, seems to work
   page_data.setElementText("");  // initialize page
-  page_data.dispatchEvent(event); 
+  page_data.dispatchEvent(event);*/ 
 }
 
 InitDOM();
 InitEvents();
-alert("done inits");
+

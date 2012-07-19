@@ -1,0 +1,33 @@
+$(document).ready(function() {
+	var eventName = "OnData";
+	var incoming = $(".system > .page_data");
+	var outgoing = $(".system > .extension_data");
+
+	incoming.each(function() {
+		$(this).change(function() {
+		// todo: handle messages from extension
+		  document.writeln(incoming.text());
+	  });
+	});
+	outgoing.text('test message');
+	var event = document.createEvent("Event");
+	event.initEvent(eventName,true,true);
+	
+	function sendMessage(msg)
+	{
+		$(outgoing).text(JSON.stringify(msg));
+		outgoing[0].dispatchEvent(event);
+	}
+	
+	incoming[0].addEventListener(eventName,function() {
+		alert($(incoming).text());
+		var msg = JSON.parse($(incoming).text());
+		if("message" in msg)
+	     switch(msg.message)
+	     {
+	     	  case "test icon":
+	     	    alert("msg.icon='"+msg.icon+"'");
+	     }
+	});
+	setTimeout(function() { sendMessage({ message :"test icon" }); },10000);
+});

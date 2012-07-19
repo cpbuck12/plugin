@@ -1,0 +1,19 @@
+<html>
+	<head>
+	<script src='jquery.js'></script>
+	<script src='jquery-ui-1.8.21.custom.min.js'></script>
+	<script src='idesktop2.js'></script>
+	<link rel="stylesheet" type="text/css" href="idesktop.css" />
+	</head>
+	<body>
+		<div class='system' >
+			<div class='extension_data'>init1</div>
+			<div class='page_data'>init0</div>
+		</div>
+		<div id='header'>
+			<div id='launch'></div>
+			<div id='trash'></div>
+			<div id='logo'>iDesktop</div>
+		</div>
+	</body>
+</html>
