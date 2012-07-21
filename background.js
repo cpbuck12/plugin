@@ -1,9 +1,29 @@
+var PostMessage;
+
+function postOpen()
+{
+  PostMessage({ message : "Open" });
+}
+function postPutOnDeck(iconInfo)
+{
+  PostMessage({ message : "PutOnDeck" , "iconInfo" : iconInfo });
+}
+function postDisplayFrame(iconInfo,frameInfo)
+{
+  PostMessage({ message : "DisplayFrame", "iconInfo" : iconInfo, "frameInfo" : frameInfo });
+}
+function postHideFrame(iconInfo)
+{
+  PostMessage({ message : "HideFrame" , "iconInfo" : iconInfo });
+}
+
 chrome.extension.onConnect.addListener(function(port) {
   var emptyFunction = function() {};
   function postMessage(msg)
   {
     port.postMessage(JSON.stringify(msg));
   }
+  PostMessage = postMessage;
   function onMessage(msg)
   {
     if(message in msg)
@@ -32,33 +52,20 @@ chrome.extension.onConnect.addListener(function(port) {
   port.onMessage.addListener(function (msg){
     msg = JSON.parse(msg);
     onMessage(msg);
- });
-  function postOpen()
-  {
-    postMessage({ message : "Open" });
-  }
-  function postPutOnDeck(iconInfo)
-  {
-    postMessage({ message : "PutOnDeck" , "iconInfo" : iconInfo });
-  }
-  function postDisplayFrame(iconInfo,frameInfo)
-  {
-    postMessage({ message : "DisplayFrame", "iconInfo" : iconInfo, "frameInfo" : frameInfo });
-  }
-  function postHideFrame(iconInfo)
-  {
-    postMessage({ message : "HideFrame" , "iconInfo" : iconInfo });
-  }
+  });
   var onOpened = emptyFunction;
-  var onPlacedOnDeck = emptyFunction;
+  var onPlacedOnDeck = function(iconInfo)
+  {
+    alert("onPlacedOnDeck");
+  }
   var onDeckToBoard = emptyFunction;
-  var onBoardToBoard = EmptyFunction;
+  var onBoardToBoard = emptyFunction;
   var onDeckToExit = emptyFunction;
-  var onBoardToExit = EmptyFunction;
-  var onStartedHovering = EmptyFunction;
-  var onStoppedHovering = EmptyFunction;
-  var onLockFrame = EmptyFunction;
-  var onUnlockFrame = EmptyFunction;
+  var onBoardToExit = emptyFunction;
+  var onStartedHovering = emptyFunction;
+  var onStoppedHovering = emptyFunction;
+  var onLockFrame = emptyFunction;
+  var onUnlockFrame = emptyFunction;
 });
 
 function getGuid()
@@ -112,12 +119,19 @@ function iDeskable(tabExtra)
   if(/ebay.com/.test(tabExtra.urlInfo.hostname)) return true;
   if(/twitter.com/.test(tabExtra.urlInfo.hostname)) return true;
   if(/facebook.com/.test(tabExtra.urlInfo.hostname)) return true;
+  if(/nytimes.com/.test(tabExtra.urlInfo.hostname)) return true;
   return false;
 }
 
 function getIcon(tabExtra)
 {
-  
+  if(/nytimes.com/.test(tabExtra.url.hostname))
+  {
+    icon["nytimes.com"] = {};
+    icon["nytimes.com"].url = "https://sites.google.com/site/cpbsites/home/nytimes.png";
+    icon["nytimes.com"].name = "nytimes.com";
+    return icon["nytimes.com"];
+  }
 }
 
 var icons = {};
@@ -278,7 +292,7 @@ function isTabiDesktop(tab)
 
 function iDesktopUrl()
 {
-  return "file://z:/abc/idesktop.html?guid=" + getGuid() + "&eid=" + chrome.i18n.getMessage("@@extension_id");
+  return "file://h:/abc/idesktop.html?guid=" + getGuid() + "&eid=" + chrome.i18n.getMessage("@@extension_id");
 }
 
 var port;
@@ -294,9 +308,14 @@ function openiDesktop(options)
   {
     function handleIcon()
     {
-      if("openicon" in options)
+      if("newicon" in options)
       {
-        
+        var tabExtra = options.newicon;
+        if(iDeskable(tabExtra))
+        {
+          var iconInfo = getIcon(tabExtra);
+          postPutOnDeck(iconInfo);
+        }
       }
     }
     if(tabs.length == 0)

@@ -57,7 +57,8 @@ $(document).ready(function() {
 	{
 	  sendMessage({ message : "UnlockFrame" , "iconInfo" : iconInfo });
 	}
-	var onPutOnDeck = emptyFunction;
+      var emptyFunction = function() {};
+	var onPutOnDeck = sendPlacedOnDeck;
 	var onDisplayFrame = emptyFunction;
 	var onHideFrame = emptyFunction;
 	
