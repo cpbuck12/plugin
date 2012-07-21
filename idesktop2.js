@@ -8,7 +8,58 @@ $(document).ready(function() {
 	
 	function onMessage(msg)
 	{
+	  if(message in msg)
+	    switch(msg.message)
+	    {
+	      case "Open" : onOpen();
+	      break;
+	      case "PutOnDeck" : onPutOnDeck(msg.iconInfo);
+	      break;
+	      case "DisplayFrame" : onDisplayFrame(msg.iconInfo,msg.frameInfo);
+	      break;
+	      case "HideFrame" : onHideFrame(msg.iconInfo);
+	      break;
+	    }
 	}
+	function sendMessageOpened()
+	{
+	  sendMessage({ message : "Opened" });
+	}
+	function sendPlacedOnDeck(iconInfo)
+	{
+	  sendMessage({ message : "PlacedOnDeck", "iconInfo" : iconInfo });
+	}
+	function sendDeckToBoard(iconInfo,destintion)
+	{
+	  sendMessage({ message : "DeckToBoard", "iconInfo" : iconInfo, "destination" : destination	});
+	} 
+	function sendBoardToBoard(iconInfo,destination)
+	{
+	  sendMessage({ message : "BoardToBoard", "iconInfo" : iconInfo, "destination" : destination });
+	} 
+	function sendToExit(iconInfo)
+	{
+	  sendMessage({ message : "ToExit", "iconInfo" : iconInfo	});
+	}
+	function sendStartedHovering(iconInfo)
+	{
+	  sendMessage({ message : "StartedHovering", "iconInfo" : iconInfo	});
+	}
+	function sendStoppedHovering()
+	{
+	  sendMessage({ message : "StoppedHovering" });
+	}
+	function sendLockFrame(iconInfo, frameInfo)
+	{
+	  sendMessage({ message : "LockFrame" , "iconInfo" : iconInfo	, "frameInfo" : frameInfo });
+	}
+	function sendUnlockFrame(iconInfo)
+	{
+	  sendMessage({ message : "UnlockFrame" , "iconInfo" : iconInfo });
+	}
+	var onPutOnDeck = emptyFunction;
+	var onDisplayFrame = emptyFunction;
+	var onHideFrame = emptyFunction;
 	
 	var eventName = "OnData";
 	var incoming = $(".system > .page_data");

@@ -1,15 +1,64 @@
 chrome.extension.onConnect.addListener(function(port) {
+  var emptyFunction = function() {};
   function postMessage(msg)
   {
     port.postMessage(JSON.stringify(msg));
   }
   function onMessage(msg)
   {
+    if(message in msg)
+      switch(msg.message)
+      {
+        case "Opened" : onOpened();
+        break;
+        case "PlacedOnDeck" : onPlacedOnDeck(msg.iconInfo);
+        break;
+        case "DeckToBoard" : onDeckToBoard(msg.iconInfo,msg.destination);
+        break;
+        case "BoardToBoard" : onBoardToBoard(msg.iconInfo,msg.destination);
+        break;
+        case "ToExit" : onToExit(msg.iconInfo);
+        break;
+        case "StartedHovering" : onStartedHovering(msg.iconInfo);
+        break;
+        case "StoppedHovering" : onStoppedHovering();
+        break;
+        case "LockFrame" : onLockFrame(msg.iconInfo,msg.frameInfo);
+        break;
+        case "UnlockFrame" : onMoveFrame(msg.iconinfo);
+        break;
+      }
   }
   port.onMessage.addListener(function (msg){
     msg = JSON.parse(msg);
     onMessage(msg);
  });
+  function postOpen()
+  {
+    postMessage({ message : "Open" });
+  }
+  function postPutOnDeck(iconInfo)
+  {
+    postMessage({ message : "PutOnDeck" , "iconInfo" : iconInfo });
+  }
+  function postDisplayFrame(iconInfo,frameInfo)
+  {
+    postMessage({ message : "DisplayFrame", "iconInfo" : iconInfo, "frameInfo" : frameInfo });
+  }
+  function postHideFrame(iconInfo)
+  {
+    postMessage({ message : "HideFrame" , "iconInfo" : iconInfo });
+  }
+  var onOpened = emptyFunction;
+  var onPlacedOnDeck = emptyFunction;
+  var onDeckToBoard = emptyFunction;
+  var onBoardToBoard = EmptyFunction;
+  var onDeckToExit = emptyFunction;
+  var onBoardToExit = EmptyFunction;
+  var onStartedHovering = EmptyFunction;
+  var onStoppedHovering = EmptyFunction;
+  var onLockFrame = EmptyFunction;
+  var onUnlockFrame = EmptyFunction;
 });
 
 function getGuid()
