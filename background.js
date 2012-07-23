@@ -125,12 +125,38 @@ function iDeskable(tabExtra)
 
 function getIcon(tabExtra)
 {
-  if(/nytimes.com/.test(tabExtra.url.hostname))
+  var icon = {};
+  icon.frame = {};
+  var hostname = tabExtra.url.hostname;
+  if(/nytimes.com/.test(hostname))
   {
-    icon["nytimes.com"] = {};
-    icon["nytimes.com"].url = "https://sites.google.com/site/cpbsites/home/nytimes.png";
-    icon["nytimes.com"].name = "nytimes.com";
-    return icon["nytimes.com"];
+    icon.url = chrome.extension.getURL("icons/nytimes.png");
+    icon.frame.url = "nytimes.com";
+    icon.id = "nytimes";
+  }
+  else if(/ebay.com/test(hostname))
+  {
+    icon.url = chrome.extension.getURL("icons/ebay.png");
+    icon.frame.url = "ebay.com";
+    icon.id = "ebay";
+  }
+  else if(/twitter.com/test(hostname))
+  {
+    icon.url = chrome.extension.getURL("icons/twitter.png");
+    icon.frame.url = "twitter.com";
+    icon.id = "twitter";
+  }
+  else if(/facebook.com/test(hostname))
+  {
+    icon.url = chrome.extension.getURL("icons/facebook.png");
+    icon.frame.url = "facebook.com";
+    icon.id = "facebook";
+  }
+  else if(/google.com/test(hostname))
+  {
+    icon.url = chrome.extension.getURL("icons/google.png");
+    icon.frame.url = "google.com";
+    icon.id = "google";
   }
 }
 
