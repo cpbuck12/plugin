@@ -38,9 +38,11 @@ for(idx = 0; idx < children.length;idx++)
 
 function InitEvents() {
   extensionPort = chrome.extension.connect();
+//  assert(extensionPort.toString());
   event = document.createEvent("Event");
   event.initEvent(eventName,true,true);
   var page_data = domShares["page_data"];
+  page_data.setElementText("initDOM");
   var extension_data = domShares["extension_data"];
   
   extensionPort.onMessage.addListener(function (msg) { // from background to page
@@ -51,6 +53,7 @@ function InitEvents() {
     var val = extension_data.getElementText();
     extensionPort.postMessage(val);
   });
+  extensionPort.postMessage(JSON.stringify({ message: "init" }));
   /* removed, seems to work
   page_data.setElementText("");  // initialize page
   page_data.dispatchEvent(event);*/ 

@@ -1,8 +1,8 @@
 var PostMessage;
-
+var iconInfo;
 function postOpen()
 {
-  PostMessage({ message : "Open" });
+  PostMessage({ message : "Open" , "openInfo" : { "extensionDir" : chrome.extension.getURL("/") } });
 }
 function postPutOnDeck(iconInfo)
 {
@@ -26,10 +26,13 @@ chrome.extension.onConnect.addListener(function(port) {
   PostMessage = postMessage;
   function onMessage(msg)
   {
-    if(message in msg)
+  //  alert("onMessage:"+JSON.stringify(msg));
+    if("message" in msg)
       switch(msg.message)
       {
-        case "Opened" : onOpened();
+        case "init" : postOpen();
+        break;
+        case "Opened" : onOpened(msg.openInfo);
         break;
         case "PlacedOnDeck" : onPlacedOnDeck(msg.iconInfo);
         break;
@@ -53,10 +56,15 @@ chrome.extension.onConnect.addListener(function(port) {
     msg = JSON.parse(msg);
     onMessage(msg);
   });
-  var onOpened = emptyFunction;
+  var onOpened = function(openInfo) {
+    if(!(iconInfo === undefined))
+    {
+      postPutOnDeck(iconInfo);
+    }
+  };
   var onPlacedOnDeck = function(iconInfo)
   {
-    alert("onPlacedOnDeck");
+//    alert("onPlacedOnDeck");
   }
   var onDeckToBoard = emptyFunction;
   var onBoardToBoard = emptyFunction;
@@ -123,41 +131,47 @@ function iDeskable(tabExtra)
   return false;
 }
 
-function getIcon(tabExtra)
+function iconURL(fileName)
+{
+  return "file://z:/abc/icons/"+fileName;
+}
+
+function getIconInfo(tabExtra)
 {
   var icon = {};
   icon.frame = {};
-  var hostname = tabExtra.url.hostname;
+  var hostname = tabExtra.urlInfo.hostname;
   if(/nytimes.com/.test(hostname))
   {
-    icon.url = chrome.extension.getURL("icons/nytimes.png");
+    icon.url = iconURL("nytimes.png");
     icon.frame.url = "nytimes.com";
     icon.id = "nytimes";
   }
-  else if(/ebay.com/test(hostname))
+  else if(/ebay.com/.test(hostname))
   {
-    icon.url = chrome.extension.getURL("icons/ebay.png");
+    icon.url = iconURL("ebay.png");
     icon.frame.url = "ebay.com";
     icon.id = "ebay";
   }
-  else if(/twitter.com/test(hostname))
+  else if(/twitter.com/.test(hostname))
   {
-    icon.url = chrome.extension.getURL("icons/twitter.png");
+    icon.url = iconURL("twitter.png");
     icon.frame.url = "twitter.com";
     icon.id = "twitter";
   }
-  else if(/facebook.com/test(hostname))
+  else if(/facebook.com/.test(hostname))
   {
-    icon.url = chrome.extension.getURL("icons/facebook.png");
+    icon.url = iconURL("facebook.png");
     icon.frame.url = "facebook.com";
     icon.id = "facebook";
   }
-  else if(/google.com/test(hostname))
+  else if(/google.com/.test(hostname))
   {
-    icon.url = chrome.extension.getURL("icons/google.png");
+    icon.url = iconURL("google.png");
     icon.frame.url = "google.com";
     icon.id = "google";
   }
+  return icon;
 }
 
 var icons = {};
@@ -318,7 +332,7 @@ function isTabiDesktop(tab)
 
 function iDesktopUrl()
 {
-  return "file://h:/abc/idesktop.html?guid=" + getGuid() + "&eid=" + chrome.i18n.getMessage("@@extension_id");
+  return "file://z:/abc/idesktop.html"+"?guid=" + getGuid() + "&eid=" + chrome.i18n.getMessage("@@extension_id");
 }
 
 var port;
@@ -334,13 +348,14 @@ function openiDesktop(options)
   {
     function handleIcon()
     {
+      if(!(typeof iconInfo === undefined))
+        delete iconInfo;
       if("newicon" in options)
       {
         var tabExtra = options.newicon;
         if(iDeskable(tabExtra))
         {
-          var iconInfo = getIcon(tabExtra);
-          postPutOnDeck(iconInfo);
+          iconInfo = getIconInfo(tabExtra);
         }
       }
     }
