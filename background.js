@@ -133,7 +133,7 @@ function iDeskable(tabExtra)
 
 function iconURL(fileName)
 {
-  return "file://z:/abc/icons/"+fileName;
+  return "file://x:/abc/icons/"+fileName;
 }
 
 function getIconInfo(tabExtra)
@@ -332,7 +332,7 @@ function isTabiDesktop(tab)
 
 function iDesktopUrl()
 {
-  return "file://z:/abc/idesktop.html"+"?guid=" + getGuid() + "&eid=" + chrome.i18n.getMessage("@@extension_id");
+  return "file://x:/abc/idesktop.html"+"?guid=" + getGuid() + "&eid=" + chrome.i18n.getMessage("@@extension_id");
 }
 
 var port;

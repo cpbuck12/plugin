@@ -8,8 +8,7 @@ $(document).ready(function() {
   {
     if("message" in msg)
       switch(msg.message)
-      {
-        case "Open" : onOpen(msg.openInfo);
+      {        case "Open" : onOpen(msg.openInfo);
         break;
         case "PutOnDeck" : onPutOnDeck(msg.iconInfo);
         break;
@@ -101,8 +100,7 @@ $(document).ready(function() {
   board.css('overflow','auto');
   board.height(window.innerHeight-$("#header").height());
   for(irow = 0;irow < rows;irow++)
-  {
-    board.append("<div />");
+  {    board.append("<div />");
     var row = $(board).children().last();
     row.css('white-space','nowrap');
     row.width(cols*128);
@@ -122,7 +120,7 @@ $(document).ready(function() {
         $(this).addClass("subtile"+index);
         $(this).css('z-index',index);
       });
-      $("<img src='file://z:/abc/sysicons/128gray.png' />").appendTo(layers.background);
+      $("<img src='file://x:/abc/sysicons/128gray.png' />").appendTo(layers.background);
       var altBg = ((icol + irow) % 2 == 1);
       $(layers.background).children().fadeTo(0,altBg ? .15 : .25);
       $(layers.content).droppable({
@@ -143,7 +141,7 @@ $(document).ready(function() {
           //$(this).children().last().draggable({ zIndex: 100, revert: 'invalid', start: function() { alert('start'); } });
           $(this).droppable('destroy');
           var cover = $(this).parent().children(".tilecover");
-          cover.append("<img src='file://z:/abc/sysicons/cover.png' class='cover'/>");
+          cover.append("<img src='file://x:/abc/sysicons/cover.png' class='cover' style='display:none;'/>");
           var ii = 0;/*
           cover.children("img").on({
             mouseenter : function() {
@@ -200,13 +198,13 @@ $(document).ready(function() {
           theThis.append("<img />");
           var img = $(this).children().last();
           img.css('top',16).css('left',16).css('z-index',1);
-          img.attr('src',"file://z:/abc/sysicons/cover.png");
+          img.attr('src',"file://x:/abc/sysicons/cover.png");
           //ui.draggable.css('top',newTop).css('left',newLeft);
         }*/
       });/*
       if((icol + irow) % 2 == 1)
       {
-        last.append("<img src="+"'file://z:/abc/sysicons/128gray.png'/>");
+        last.append("<img src="+"'file://x:/abc/sysicons/128gray.png'/>");
         last.children().last().fadeTo(0,.1).css('z-index','-1');
       }*/
     }
