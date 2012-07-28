@@ -69,15 +69,18 @@ $(document).ready(function() {
     newIcon.attr('visibility','hidden');
     newIcon.appendTo(onDeck); // TODO: make sure we're still connected through newIcon after appending
     newIcon.each(function() {
-      $(this).css('z-index',onDeck.children().length-1).attr("src",iconInfo.url);
+      $(this).css('z-index',onDeck.children().length-1).attr("src",iconInfo.url).css('position','absolute');
 //      $(this).fadeOut(0,function() { newIcon.css('visibility','visible'); } );
      // $(this).fadeIn(1000*6,function() {sendPlacedOnDeck(iconInfo);});
-     $(this).fadeOut(0);
-     $(this).attr('visibility','visible');
+      $(this).fadeOut(0);
+      $(this).attr('visibility','visible');
       $(this).fadeIn();
-      $(this).draggable({ zIndex: 100, revert: 'invalid' });
+      //$(this).draggable({ zIndex: 100, revert: 'invalid' });
+      $(this).drag(function(ev,dd) {
+        $(this).css({ top : dd.offsetY, left : dd.offsetX });
+      });
     });
-  }
+  };
   var onDisplayFrame = emptyFunction;
   var onHideFrame = emptyFunction;
   
@@ -100,16 +103,16 @@ $(document).ready(function() {
   board.css('overflow','auto');
   board.height(window.innerHeight-$("#header").height());
   for(irow = 0;irow < rows;irow++)
-  {    board.append("<div />");
+  {
+    board.append("<div class='row-"+irow+"'/>");
     var row = $(board).children().last();
     row.css('white-space','nowrap');
     row.width(cols*128);
     for(icol = 0;icol < cols;icol++)
     {
-      var div = $("<div class='tile'/>");
+      var div = $("<div class='tile col-"+icol+"'/>");
       div.appendTo(row);
       var last = row.children().last();
-      
       var tile = $("<div class='tilebackground' /><div class='tilecontent' /><div class='tilecover' />");
       tile.appendTo(last);
       var layers = {};
@@ -120,17 +123,40 @@ $(document).ready(function() {
         $(this).addClass("subtile"+index);
         $(this).css('z-index',index);
       });
-      $("<img src='file://x:/abc/sysicons/128gray.png' />").appendTo(layers.background);
+      $("<img src='file://v:/abc/sysicons/128gray.png' />").appendTo(layers.background);
       var altBg = ((icol + irow) % 2 == 1);
       $(layers.background).children().fadeTo(0,altBg ? .15 : .25);
-      $(layers.content).droppable({
-        over: function(event,ui) { 
+      $(layers.content).drop('start',function() {
         $(this).parent().children(".tilebackground").children("img").fadeToggle("fast");
-      },
+      })
+      .drop('end',function() {
+        $(this).parent().children(".tilebackground").children("img").fadeToggle("fast");
+      })
+      .drop(function(ev,dd) {
+          var cover = $(this).parent().children(".tilecover");
+          var icon = $(dd.drag).unbind('drag').detach();
+          icon.appendTo(this);
+  //     $(this).css('z-index',onDeck.children().length-1).attr("src",iconInfo.url).css('position','absolute');
+         icon.css({ position : 'relative', top : '', left : '' });
+         icon.addClass("placedicon");
+          cover.append("<img src='file://v:/abc/sysicons/cover.png' class='cover'/>");
+          cover.children("img").drag('init',function(ev,dd) {
+            icon.removeClass("placedicon");
+            var theThis = $(this);
+            var parent = theThis.parent();
+            var grandParent = parent.parent();
+            var content = grandParent.children(".tilecontent");
+            var img = content.children("img");
+            return img;
+          });
+      });
+      /*$(layers.content).droppable({
+        over: function(event,ui) { 
+          $(this).parent().children(".tilebackground").children("img").fadeToggle("fast");
+        },
         //$(layers.background).css('background-color','red'); },
         out: function(event,ui) {
-          var img = $(this).parent().children(".tilebackground").children("img")
-          img.fadeToggle("fast");
+          $(this).parent().children(".tilebackground").children("img").fadeToggle("fast");
         },
           //$(layers.background).css('background-color',''); },
         drop:function(event,ui) {
@@ -141,72 +167,24 @@ $(document).ready(function() {
           //$(this).children().last().draggable({ zIndex: 100, revert: 'invalid', start: function() { alert('start'); } });
           $(this).droppable('destroy');
           var cover = $(this).parent().children(".tilecover");
-          cover.append("<img src='file://x:/abc/sysicons/cover.png' class='cover' style='display:none;'/>");
-          var ii = 0;/*
+          cover.append("<img src='file://v:/abc/sysicons/cover.png' class='cover'/>");
+          var ii = 0;
           cover.children("img").on({
-            mouseenter : function() {
-              
-              console.log("over"+ ++ii);
-              var theThis = $(this);
-              theThis.data('display',theThis.css('display'));
-              //theThis.css('display','none');
-              theThis.fadeOut(0);
+            mousedown : function() {
+              console.log('mousedown');
+              $(this).parent().children(".tilecontent").children("img").mousedown();
+            },
+            mouseup : function() {
+              console.log('mouseup');
+              $(this).parent().children(".tilecontent").children("img").mouseup();
+            },
+            click: function() {
+              console.log('click');
+              $(this).parent().children(".tilecontent").children("img").click();
             }
-          });*/
-          cover.on({
-            mouseenter : function() {
-              
-              console.log("over"+ ++ii);
-              var theThis = $(this);
-              theThis.data('display',theThis.css('display'));
-              //theThis.css('display','none');
-              theThis.fadeOut(0);
-            }
-         });
-         $(this).parent().children(".tilecontent").on({
-           mouseleave : function()
-           {
-             $(this).parent().children(".tilecover").fadeIn(0);
-           }
-         });
-          icon.draggable({ 
-          /* helper : function(event,ui) {
-              return $(this).parent().children(".tilecontent").children("img"); 
-            }*/
           });
-          var img = $(this).parent().children(".tilebackground").children("img");
-          for(i = 0;i < 1;i++)
-            img.fadeToggle(30);
-          img.fadeOut("fast");
-       }
-        /*
-      last.addClass(altBg ? "tile2":"tile").droppable({
-        over: function(event,ui) { $(this).css('background-color','rgb(30,30,30)'); },
-        out: function(event,ui) { $(this).css('background-color'erter,''); },
-        drop: function(event,ui) {
-          $(this).css('background-color','');
-          var icon = ui.draggable.detach();
-          
-          icon.appendTo(this).css('top',32).css('left',32).css('z-index',1);*/
-          /*
-          var posDrag = ui.draggable.position();
-          var posBoard = board.position();
-          var newTop = (32 - ((posDrag.top - posBoard.top) % 128)) + posDrag.top;
-          var newLeft = (32 - ((posDrag.left - posBoard.left) % 128)) + posDrag.left;
-          ui.draggable.animate({ top: newTop, left: newLeft },1000);
-          var theThis = $(this);
-          theThis.append("<img />");
-          var img = $(this).children().last();
-          img.css('top',16).css('left',16).css('z-index',1);
-          img.attr('src',"file://x:/abc/sysicons/cover.png");
-          //ui.draggable.css('top',newTop).css('left',newLeft);
-        }*/
-      });/*
-      if((icol + irow) % 2 == 1)
-      {
-        last.append("<img src="+"'file://x:/abc/sysicons/128gray.png'/>");
-        last.children().last().fadeTo(0,.1).css('z-index','-1');
-      }*/
+        }
+      });*/
     }
   }
 });
