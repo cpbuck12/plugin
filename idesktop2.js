@@ -64,23 +64,21 @@ $(document).ready(function() {
   
   var onDeck = $("#onDeck");  
   var onPutOnDeck = function(iconInfo) {
-//	  $("#ondeck"). TODO, actual jquery stuff
     var newIcon = $("<img />");
     newIcon.attr('visibility','hidden');
     newIcon.appendTo(onDeck); // TODO: make sure we're still connected through newIcon after appending
     newIcon.each(function() {
       $(this).css('z-index',onDeck.children().length-1).attr("src",iconInfo.url).css('position','absolute');
-//      $(this).fadeOut(0,function() { newIcon.css('visibility','visible'); } );
-     // $(this).fadeIn(1000*6,function() {sendPlacedOnDeck(iconInfo);});
       $(this).fadeOut(0);
       $(this).attr('visibility','visible');
       $(this).fadeIn();
-      //$(this).draggable({ zIndex: 100, revert: 'invalid' });
       $(this).drag(function(ev,dd) {
         $(this).css({ top : dd.offsetY, left : dd.offsetX });
+      }).drag('end',function(ev,dd) {
+        var icon = $(dd.drag).unbind('drag');
       });
     });
-  };
+  }
   var onDisplayFrame = emptyFunction;
   var onHideFrame = emptyFunction;
   
@@ -98,8 +96,6 @@ $(document).ready(function() {
   var cols = Math.floor(screen.width * 1 / 128) + 2;
   var rows = Math.floor(screen.height * 1 / 128) + 2;
   var board = $("#board");
-//	board.width(cols * 128);
-//	board.height(rows * 128);
   board.css('overflow','auto');
   board.height(window.innerHeight-$("#header").height());
   for(irow = 0;irow < rows;irow++)
@@ -133,58 +129,22 @@ $(document).ready(function() {
         $(this).parent().children(".tilebackground").children("img").fadeToggle("fast");
       })
       .drop(function(ev,dd) {
-          var cover = $(this).parent().children(".tilecover");
-          var icon = $(dd.drag).unbind('drag').detach();
-          icon.appendTo(this);
-  //     $(this).css('z-index',onDeck.children().length-1).attr("src",iconInfo.url).css('position','absolute');
-         icon.css({ position : 'relative', top : '', left : '' });
-         icon.addClass("placedicon");
-          cover.append("<img src='file://v:/abc/sysicons/cover.png' class='cover'/>");
-          cover.children("img").drag('init',function(ev,dd) {
-            icon.removeClass("placedicon");
-            var theThis = $(this);
-            var parent = theThis.parent();
-            var grandParent = parent.parent();
-            var content = grandParent.children(".tilecontent");
-            var img = content.children("img");
-            return img;
-          });
+        var cover = $(this).parent().children(".tilecover");
+        var icon = $(dd.drag).detach();
+        icon.appendTo(this);
+        icon.css({ position : 'absolute', top : '32', left : '32' });
+//        icon.addClass("placedicon");
+        cover.append("<img src='file://v:/abc/sysicons/cover.png' class='cover'/>");
+        cover.children("img").drag('init',function(ev,dd) {
+          icon.removeClass("placedicon");
+          var theThis = $(this);
+          var parent = theThis.parent();
+          var grandParent = parent.parent();
+          var content = grandParent.children(".tilecontent");
+          var img = content.children("img")[0];
+          return img;
+        });
       });
-      /*$(layers.content).droppable({
-        over: function(event,ui) { 
-          $(this).parent().children(".tilebackground").children("img").fadeToggle("fast");
-        },
-        //$(layers.background).css('background-color','red'); },
-        out: function(event,ui) {
-          $(this).parent().children(".tilebackground").children("img").fadeToggle("fast");
-        },
-          //$(layers.background).css('background-color',''); },
-        drop:function(event,ui) {
-          $(layers.background).css('background-color','');
-          var icon = ui.draggable.detach().css('top','').css('left','').addClass('placedicon');
-          
-          icon.appendTo(this);
-          //$(this).children().last().draggable({ zIndex: 100, revert: 'invalid', start: function() { alert('start'); } });
-          $(this).droppable('destroy');
-          var cover = $(this).parent().children(".tilecover");
-          cover.append("<img src='file://v:/abc/sysicons/cover.png' class='cover'/>");
-          var ii = 0;
-          cover.children("img").on({
-            mousedown : function() {
-              console.log('mousedown');
-              $(this).parent().children(".tilecontent").children("img").mousedown();
-            },
-            mouseup : function() {
-              console.log('mouseup');
-              $(this).parent().children(".tilecontent").children("img").mouseup();
-            },
-            click: function() {
-              console.log('click');
-              $(this).parent().children(".tilecontent").children("img").click();
-            }
-          });
-        }
-      });*/
     }
   }
 });
